@@ -103,7 +103,7 @@ namespace AutoCodeSender
                             var mainEmbed = new
                             {
                                 description = NiceEmbedMessage,
-                                color = ColorUtility.ToHtmlStringRGB(GorillaTagger.Instance.offlineVRRig.playerColor),
+                                color = 0x3498db,
                                 author = new
                                 {
                                     name = "Auto Code Sender",
@@ -178,6 +178,9 @@ namespace AutoCodeSender
                 }
             });
         }
+
+
+
 
         private static byte[] Texture2DToByteArray(Texture2D texture)
         {
