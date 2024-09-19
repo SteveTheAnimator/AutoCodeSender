@@ -80,7 +80,7 @@ namespace AutoCodeSender
             return playerCount == 1 ? "Player" : "Players";
         }
 
-        public static void SendMessage(string URL, string Message, Texture2D Photo = null, Texture2D Photo2 = null, Texture2D Photo3 = null, string EmbedImageUrl = null, string EmbedImageUrl2 = null, string EmbedImageUrl3 = null)
+        public static void SendMessage(string URL, string Message, Texture2D Photo = null, Texture2D Photo2 = null, Texture2D Photo3 = null, string EmbedImageUrl = "https://raw.githubusercontent.com/SteveTheAnimator/AutoCodeSender/main/Marketing/ACS.png", string EmbedImageUrl2 = null, string EmbedImageUrl3 = null)
         {
             if (string.IsNullOrEmpty(URL))
             {
@@ -93,32 +93,25 @@ namespace AutoCodeSender
                 {
                     using (HttpClient client = new HttpClient())
                     {
-                        // Prepare the message content for the embed
                         string messagetosend = Message;
                         string NiceEmbedMessage = "> " + messagetosend;
 
                         using (var form = new MultipartFormDataContent())
                         {
-                            // Create the embed JSON structure
                             var embeds = new List<object>();
 
-                            // Main embed with message
                             var mainEmbed = new
                             {
                                 description = NiceEmbedMessage,
-                                color = 0x3498db  // Blue color (optional)
+                                color = ColorUtility.ToHtmlStringRGB(GorillaTagger.Instance.offlineVRRig.playerColor),
+                                author = new
+                                {
+                                    name = "Auto Code Sender",
+                                    icon_url = EmbedImageUrl
+                                }
                             };
 
                             embeds.Add(mainEmbed);
-
-                            // Add image embeds if URLs are provided
-                            if (!string.IsNullOrEmpty(EmbedImageUrl))
-                            {
-                                embeds.Add(new
-                                {
-                                    image = new { url = EmbedImageUrl }
-                                });
-                            }
 
                             if (!string.IsNullOrEmpty(EmbedImageUrl2))
                             {
@@ -136,20 +129,16 @@ namespace AutoCodeSender
                                 });
                             }
 
-                            // Create payload with content and embeds
                             var payload = new
                             {
-                                content = "",  // No plain message content, only embed
+                                content = "",
                                 embeds = embeds
                             };
 
-                            // Serialize payload to JSON
                             string payloadJson = Newtonsoft.Json.JsonConvert.SerializeObject(payload);
 
-                            // Add the payload JSON to the form
                             form.Add(new StringContent(payloadJson, Encoding.UTF8, "application/json"), "payload_json");
 
-                            // Attach Texture2D photos as files if they exist
                             if (Photo != null)
                             {
                                 var imageData = Texture2DToByteArray(Photo);
@@ -174,7 +163,6 @@ namespace AutoCodeSender
                                 form.Add(imageContent3, "file3", "photo3.jpg");
                             }
 
-                            // Send the POST request
                             HttpResponseMessage response = client.PostAsync(URL, form).GetAwaiter().GetResult();
 
                             if (!response.IsSuccessStatusCode)
@@ -190,7 +178,6 @@ namespace AutoCodeSender
                 }
             });
         }
-
 
         private static byte[] Texture2DToByteArray(Texture2D texture)
         {
